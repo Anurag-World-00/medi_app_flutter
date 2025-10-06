@@ -18,7 +18,8 @@ class Repo {
     String email,
     String phoneNumber,
     String pinCode,
-  ) async {
+  )
+  async {
     try {
       final response = await http.post(
         Uri.parse("$BASE_URL$CREATE_USER_ENDPOINT"),
@@ -78,13 +79,15 @@ class Repo {
         throw Exception("Unexpected status: ${response.statusCode}");
       }
     } catch (e) {
+      print(e.toString());
       throw Exception(e.toString());
     }
   }
 
   Future<GetProductByProductNameResponse> getProductByProductName(
     String productName,
-  ) async {
+  )
+  async {
     try {
       final response = await http.post(
         Uri.parse("$BASE_URL$GET_PRODUCTBYPRODUCTNAME_ENDPOINT"),
@@ -114,7 +117,8 @@ class Repo {
     String userName,
     String message,
     String category,
-  ) async {
+  )
+  async {
     try {
       final response = await http.post(
         Uri.parse("$BASE_URL$ADD_ORDER_ENDPOINT"),
@@ -137,16 +141,20 @@ class Repo {
 
         return CreateUserResponse.fromJson(json);
       } else if (response.statusCode == 400) {
+        print("Unexpected status: ${response.statusCode}");
         throw Exception("Not found");
       } else {
+        print("Unexpected status: ${response.statusCode}");
         throw Exception("Unexpected status: ${response.statusCode}");
       }
     } catch (e) {
+      print("Unexpected status: ${e.toString()}");
       throw Exception(e.toString());
     }
   }
 
-  Future<GetUserStockResponse> getAllStock(String userId) async {
+  Future<GetUserStockResponse> getAllStock(String userId)
+  async {
     try {
       final response = await http.post(
         Uri.parse("$BASE_URL$GET_USERSTOCK_ENDPOINT"),

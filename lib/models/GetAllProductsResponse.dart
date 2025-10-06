@@ -26,7 +26,7 @@ class Product {
   final String dateOfProductCreation;
   final int id;
   final String name;
-  final num price;
+  final double price;
   final String productId;
   final int stock;
 
@@ -39,16 +39,37 @@ class Product {
     required this.productId,
     required this.stock,
   });
-
   factory Product.fromJson(Map<String, dynamic> json) {
+    // Helper function to safely parse a value into a double
+    double _safeToDouble(dynamic value) {
+      if (value is num) {
+        return value.toDouble();
+      } else if (value is String) {
+        // Use tryParse to convert strings like "10.99" or "10"
+        return double.tryParse(value) ?? 0.0; // Default to 0.0 if parsing fails
+      }
+      return 0.0; // Default if neither num nor String
+    }
+
+    // You should also use the int-safe helper for id and stock
+    // to cover both of your reported errors.
+    int _safeToInt(dynamic value) {
+      if (value is int) return value;
+      if (value is String) return int.tryParse(value) ?? 0;
+      return 0;
+    }
+
     return Product(
       category: json['category'] as String,
       dateOfProductCreation: json['date_of_product_creation'] as String,
-      id: json['id'] as int,
+      // Use safe parsing for 'id' and 'stock' (which expect int)
+      id: _safeToInt(json['id']),
       name: json['name'] as String,
-      price: json['price'] as num,
+      // Apply the robust parsing for 'price' (which expects double/num)
+      price: _safeToDouble(json['price']),
+
       productId: json['product_id'] as String,
-      stock: json['stock'] as int,
+      stock: _safeToInt(json['stock']),
     );
   }
 

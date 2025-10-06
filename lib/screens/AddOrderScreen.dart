@@ -59,32 +59,44 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
   void _calculateOrder(BuildContext context) async {
     final vm = Provider.of<MyViewModel>(context, listen: false);
 
-    Product_ID = vm.getProductByNameState.data!.message.productId.toString();
-    Product_PRICE = vm.getProductByNameState.data!.message.price.toString();
-    Product_Category = vm.getProductByNameState.data!.message.category
-        .toString();
+    if (vm.getProductByNameState.data == null) {
+      debugPrint("⚠️ No product selected or not found!");
+      return;
+    }
+
+    final product = vm.getProductByNameState.data!.message;
     final qty = int.tryParse(productQuantityController.text) ?? 0;
+    final totalAmount = (product.price * qty).toDouble();
 
-    Product_TOTAL_AMOUNT = (vm.getProductByNameState.data!.message.price * qty)
-        .toDouble();
+    try {
+      await vm.addOrder(
+         vm.userId!,
+         product.productId,
+         qty,
+         product.price.toDouble(),
+         totalAmount,
+         product.name,
+         vm.userName!,
+         productMessageController.text,
+         product.category,
+      );
 
-    print(Product_TOTAL_AMOUNT);
-    print(Product_ID);
+      // Clear UI fields after successful order
+      productNameController.clear();
+      productQuantityController.clear();
+      productMessageController.clear();
+      productStockController.clear();
 
-    await vm.addOrder(
-      vm.userId.toString(),
-      Product_ID,
-      qty,
-      double.parse(Product_PRICE),
-      Product_TOTAL_AMOUNT,
-      productNameController.text,
-      vm.userName.toString(),
-      productMessageController.text,
-      Product_Category,
-    );
-
-    clearData();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Order created successfully!")),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to create order: $e")),
+      );
+    }
   }
+
 
   @override
   void dispose() {

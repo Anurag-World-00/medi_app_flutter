@@ -1,5 +1,5 @@
+import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:medi_app/models/LoginResponse.dart';
 import 'package:medi_app/screens/AddOrderScreen.dart';
 import 'package:medi_app/screens/AllStockScreen.dart';
 import 'package:medi_app/screens/ApprovalScreen.dart';
@@ -8,13 +8,13 @@ import 'package:medi_app/screens/ProfileScreen.dart';
 import 'package:medi_app/screens/SignUpScreen.dart';
 import 'package:medi_app/viewModel/MyViewModel.dart';
 import 'package:provider/provider.dart';
-import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart';
 
 void main() {
   runApp(
-      ChangeNotifierProvider(create: (_) => MyViewModel(), child: MaterialApp(
-        home: MyApp(),
-      ),)
+    ChangeNotifierProvider(
+      create: (_) => MyViewModel(),
+      child:  MyApp(),
+    ),
   );
 }
 
@@ -26,49 +26,34 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
   @override
   Widget build(BuildContext context) {
+    final vm = Provider.of<MyViewModel>(context);
+    if (vm.isLoading == true) {
+      return MaterialApp(home: Scaffold(body: CircularProgressIndicator()));
+    }
+    Widget startScreen;
+    if (vm.userId == null) {
+      startScreen = const SignUpScreen();
+    } else {
+      startScreen = const ApprovalScreen();
+    }
 
-    return Consumer<MyViewModel>(builder: (context,vm,_){
-      if (vm.getUserProfileState.isLoading || vm.isLoading) {
-        return const Center(child: CircularProgressIndicator());
-      }
+    return MaterialApp(
+     home: startScreen,
+      routes: {
 
-      if (vm.getUserProfileState.error != null) {
-        return Center(
-          child: Text(
-            "Error: ${vm.getUserProfileState.error}",
-            style: const TextStyle(color: Colors.redAccent, fontSize: 16),
-          ),
-        );
-      }
-
-
-      return MaterialApp(
-        initialRoute: vm.userId == null ? Routes.CREATE_ROUTES : Routes.APPROVAL_ROUTES,
-        routes: {
-          Routes.CREATE_ROUTES :(context)=> SignUpScreen(),
-          Routes.APPROVAL_ROUTES :(context)=> ApprovalScreen(),
-          Routes.LOGIN_ROUTES:(context)=> LoginScreen(),
-          Routes.ORDER_ROUTES:(context)=> AddOrderScreen(),
-          Routes.STOCK_ROUTES:(context)=> AllStockScreen(),
-          Routes.PROFILE_ROUTES:(context)=> ProfileScreen(),
-          Routes.BOTTOM_ROUTES:(context)=> BottomNavBar(),
-        },
-
-      );
-
-    });
-
+        Routes.APPROVAL_ROUTES: (context) => ApprovalScreen(),
+        Routes.LOGIN_ROUTES: (context) => LoginScreen(),
+        Routes.ORDER_ROUTES: (context) => AddOrderScreen(),
+        Routes.STOCK_ROUTES: (context) => AllStockScreen(),
+        Routes.PROFILE_ROUTES: (context) => ProfileScreen(),
+        Routes.BOTTOM_ROUTES: (context) => BottomNavBar(),
+        Routes.CREATE_ROUTES: (context) => SignUpScreen(),
+      },
+    );
   }
 }
-
-
-
-
-
-
 
 class BottomNavBar extends StatefulWidget {
   const BottomNavBar({super.key});
@@ -79,7 +64,9 @@ class BottomNavBar extends StatefulWidget {
 
 class _BottomNavBarState extends State<BottomNavBar> {
   final PageController _pageController = PageController();
-  final NotchBottomBarController _notchController = NotchBottomBarController(index: 0);
+  final NotchBottomBarController _notchController = NotchBottomBarController(
+    index: 0,
+  );
 
   final List<Widget> _screens = [
     AddOrderScreen(),
@@ -125,27 +112,41 @@ class _BottomNavBarState extends State<BottomNavBar> {
           notchBottomBarController: _notchController,
           kBottomRadius: 18,
           kIconSize: 28,
-          color: Colors.lightBlueAccent.shade100, // base background
-          notchColor: Colors.lightBlueAccent.shade200, // notch highlight
+          color: Colors.lightBlueAccent.shade100,
+          // base background
+          notchColor: Colors.lightBlueAccent.shade200,
+          // notch highlight
           showLabel: true,
           bottomBarItems: [
             BottomBarItem(
-              inActiveItem: const Icon(Icons.add_box_outlined, color: Colors.white70),
-              activeItem: const Icon(Icons.add_box_rounded, color: Colors.white),
+              inActiveItem: const Icon(
+                Icons.add_box_outlined,
+                color: Colors.white70,
+              ),
+              activeItem: const Icon(
+                Icons.add_box_rounded,
+                color: Colors.white,
+              ),
               itemLabel: 'Add Order',
-
             ),
             BottomBarItem(
-              inActiveItem: const Icon(Icons.inventory_2_outlined, color: Colors.white70),
-              activeItem: const Icon(Icons.inventory_2_rounded, color: Colors.white),
+              inActiveItem: const Icon(
+                Icons.inventory_2_outlined,
+                color: Colors.white70,
+              ),
+              activeItem: const Icon(
+                Icons.inventory_2_rounded,
+                color: Colors.white,
+              ),
               itemLabel: 'All Stock',
-
             ),
             BottomBarItem(
-              inActiveItem: const Icon(Icons.person_outline, color: Colors.white70),
+              inActiveItem: const Icon(
+                Icons.person_outline,
+                color: Colors.white70,
+              ),
               activeItem: const Icon(Icons.person, color: Colors.white),
               itemLabel: 'Profile',
-
             ),
           ],
           onTap: (index) {
@@ -157,10 +158,8 @@ class _BottomNavBarState extends State<BottomNavBar> {
   }
 }
 
-
-
-class Routes{
-  static const CREATE_ROUTES  = '/';
+class Routes {
+  static const CREATE_ROUTES = '/create';
   static const APPROVAL_ROUTES = '/approval';
   static const LOGIN_ROUTES = '/login';
   static const ORDER_ROUTES = '/order';

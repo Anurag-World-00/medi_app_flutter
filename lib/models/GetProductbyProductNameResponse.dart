@@ -24,7 +24,7 @@ class Product {
   final String dateOfProductCreation;
   final int id;
   final String name;
-  final num price;
+  final double price;
   final String productId;
   final int stock;
 
@@ -44,7 +44,8 @@ class Product {
       dateOfProductCreation: json['date_of_product_creation'] as String,
       id: json['id'] as int,
       name: json['name'] as String,
-      price: json['price'] as num,
+      price: (json['price'] as num).toDouble(),
+
       productId: json['product_id'] as String,
       stock: json['stock'] as int,
     );

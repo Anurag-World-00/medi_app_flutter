@@ -156,7 +156,8 @@ class MyViewModel extends ChangeNotifier {
     String userName,
     String message,
     String category,
-  ) async {
+  )
+  async {
     _addOrderState = UiState.loading();
     notifyListeners();
 
